@@ -1,6 +1,7 @@
 from distutils.sysconfig import get_python_lib
 import shutil
 import os
+import sys
 import re
 import subprocess
     
@@ -11,9 +12,11 @@ LN_FILES = {'/opt/local/lib/libFLAC.8.2.0.dylib' : '/opt/local/lib/libFLAC.8.dyl
             '/usr/local/lib/liblabjackusb-2.0.3.dylib' : '/usr/local/lib/liblabjackusb.dylib'}
 
 RAM_CONTROL_GIT = 'https://github.com/ramdarpaprojectorg/RAMControl.git'
-RAM_CONTROL_LOCATION = os.path.join(HOME, 'RAM_3.02')
+RAM_CONTROL_LOCATION = os.path.join(HOME, 'RAM_3.0')
 
 UNTARS = 'experiments/RAM_FR/videos.tar.xz', 'experiments/RAM_catFR/videos.tar.xz'
+
+USER = subprocess.check_output(['who', 'am', 'i']).split()[0]
 
 def confirm(message):
     rsp = raw_input(message)
@@ -97,7 +100,8 @@ def clone_ram_control():
     ]
 
     untar_command = [ 'tar', '-xvf']
-        
+    
+    chown_command = ['chown', '-R', USER, RAM_CONTROL_LOCATION]
     
     cwd = os.getcwd()
     subprocess.call(clone_cmd)
@@ -110,6 +114,16 @@ def clone_ram_control():
         subprocess.call(untar_command + [tar])
 
     os.chdir(cwd)
+    
+    subprocess.call(chown_command)
+
+def sign_python():
+    executable = sys.executable
+    cmd = ['codesign', '-f', '--verbose', '--deep', '-s', 'UPenn-RAM', executable]
+    verify_cmd = ['codesign', '-dvvvv', executable]
+    print 'Signing ', executable
+    subprocess.call(cmd)
+    subprocess.call(verify_cmd)
 
 
 def run():
@@ -129,7 +143,8 @@ def run():
     
     print("Cloning RAM repositories")
     clone_ram_control()
-
+    
+    sign_python()
     print("Installation complete")
 
 if __name__ == '__main__':
