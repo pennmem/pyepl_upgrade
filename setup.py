@@ -16,7 +16,7 @@ RAM_CONTROL_LOCATION = os.path.join(HOME, 'RAM_3.0')
 
 UNTARS = 'experiments/RAM_FR/videos.tar.xz', 'experiments/RAM_catFR/videos.tar.xz'
 
-USER = subprocess.check_output(['who', 'am', 'i']).split()[0]
+USER = subprocess.Popen(['who', 'am', 'i'], stdout=subprocess.PIPE).communicate()[0].split()[0]
 
 def confirm(message):
     rsp = raw_input(message)
@@ -104,26 +104,28 @@ def clone_ram_control():
     chown_command = ['chown', '-R', USER, RAM_CONTROL_LOCATION]
     
     cwd = os.getcwd()
-    subprocess.call(clone_cmd)
+    subprocess.Popen(clone_cmd)
     os.chdir(RAM_CONTROL_LOCATION)
     for cmd in submodule_commands:
-        subprocess.call(cmd)
+        subprocess.Popen(cmd)
     
     for tar in UNTARS:
         print("Extracting %s"%tar)
-        subprocess.call(untar_command + [tar])
+        os.chdir(RAM_CONTROL_LOCATION)
+        os.chdir(os.path.dirname(tar))
+        subprocess.Popen(untar_command + [os.path.basename(tar)] )
 
     os.chdir(cwd)
     
-    subprocess.call(chown_command)
+    subprocess.Popen(chown_command)
 
 def sign_python():
     executable = sys.executable
     cmd = ['codesign', '-f', '--verbose', '--deep', '-s', 'UPenn-RAM', executable]
     verify_cmd = ['codesign', '-dvvvv', executable]
     print 'Signing ', executable
-    subprocess.call(cmd)
-    subprocess.call(verify_cmd)
+    subprocess.Popen(cmd)
+    subprocess.Popen(verify_cmd)
 
 
 def run():
