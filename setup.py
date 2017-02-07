@@ -1,10 +1,10 @@
+from __future__ import print_function
 from distutils.sysconfig import get_python_lib
 import shutil
 import os
 import sys
-import re
 import subprocess
-    
+
 HOME = os.environ['HOME']
 SITE_PKG_REPLACE = '__SITE_PACKAGE_DIR__'
 INSTALL_FILE = './installed_files.txt'
@@ -18,20 +18,22 @@ UNTARS = 'experiments/RAM_FR/videos.tar.xz', 'experiments/RAM_catFR/videos.tar.x
 
 USER = subprocess.Popen(['who', 'am', 'i'], stdout=subprocess.PIPE).communicate()[0].split()[0]
 
+
 def confirm(message):
     rsp = raw_input(message)
     while rsp.lower() not in ('y', 'n'):
-        print 'Please enter "y" or "n"'
+        print('Please enter "y" or "n"')
         rsp = raw_input(message)
     return rsp == 'y'
 
+
 def fix_bash_init(filename):
     if not os.path.exists(filename):
-        print '%s does not exist. Skipping' % (filename)
+        print('%s does not exist. Skipping' % (filename))
     changed = False
-    with open(filename, 'r') as file:
+    with open(filename, 'r') as f:
         lines = []
-        for line in file:
+        for line in f:
             if 'alias python' not in line:
                 lines.append(line)
             else:
@@ -39,25 +41,26 @@ def fix_bash_init(filename):
                     lines.append(line)
                 else:
                     changed = True
-    
+
     if changed:
-        print 'Writing over %s' % (filename)
+        print('Writing over %s' % (filename))
         with open(filename, 'w') as out_file:
             out_file.write(''.join(lines))
     else:
-        print 'No changes to make to %s' % (filename) 
+        print('No changes to make to %s' % (filename))
     return changed
+
 
 def copy_files():
     site_packages = get_python_lib()
 
     files = [x.strip() for x in open(INSTALL_FILE).readlines()]
 
-    for file in files:
-        if file[-3:] == 'pyc':
+    for filename in files:
+        if filename[-3:] == 'pyc':
             continue
-        source = './'+file
-        destination = file.replace(SITE_PKG_REPLACE, site_packages)
+        source = './' + filename
+        destination = filename.replace(SITE_PKG_REPLACE, site_packages)
         dest_dir, _ = os.path.split(destination)
 
         if os.path.exists(destination):
@@ -73,10 +76,12 @@ def copy_files():
         except:
             print("WARNING: Could not copy %s to %s" % (source, destination))
 
+
 def link_files():
     for source, dest in LN_FILES.items():
         os.system("ln -s %s %s" % (source, dest))
         print("Linked %s to %s" % (source, dest))
+
 
 def check_for_conda():
 
@@ -84,31 +89,32 @@ def check_for_conda():
 
     if not ('anaconda' in site_packages or 'miniconda' in site_packages):
         if not confirm("It appears you are not installing into a conda environment.\n" \
-                       "Site packages is %s\n" % site_packages + "" 
+                       "Site packages is %s\n" % site_packages + ""
                        "Are you sure you want to continue? "):
             exit(0)
     else:
         if not confirm("Installing into python site-packages located at %s. Do you want to continue? " % (site_packages)):
             exit(0)
 
+
 def clone_ram_control():
     clone_cmd = ['git', 'clone', RAM_CONTROL_GIT, RAM_CONTROL_LOCATION]
-    
+
     submodule_commands = [
         ['git', 'submodule', 'init'],
         ['git', 'submodule', 'update']
     ]
 
     untar_command = [ 'tar', '-xvf']
-    
+
     chown_command = ['chown', '-R', USER, RAM_CONTROL_LOCATION]
-    
+
     cwd = os.getcwd()
     subprocess.Popen(clone_cmd)
     os.chdir(RAM_CONTROL_LOCATION)
     for cmd in submodule_commands:
         subprocess.Popen(cmd)
-    
+
     for tar in UNTARS:
         print("Extracting %s"%tar)
         os.chdir(RAM_CONTROL_LOCATION)
@@ -116,14 +122,15 @@ def clone_ram_control():
         subprocess.Popen(untar_command + [os.path.basename(tar)] )
 
     os.chdir(cwd)
-    
+
     subprocess.Popen(chown_command)
+
 
 def sign_python():
     executable = sys.executable
     cmd = ['codesign', '-f', '--verbose', '--deep', '-s', 'UPenn-RAM', executable]
     verify_cmd = ['codesign', '-dvvvv', executable]
-    print 'Signing ', executable
+    print('Signing ', executable)
     subprocess.Popen(cmd)
     subprocess.Popen(verify_cmd)
 
@@ -135,19 +142,20 @@ def run():
     if changed_rc or changed_profile:
         print("Due to a change in bash initialization, it is recommended that you restart your terminal before continuing")
         exit(0)
-    
+
     check_for_conda()
     copy_files()
     link_files()
 
     print("Attempting to disable network time...")
     os.system("systemsetup -setusingnetworktime off")
-    
+
     print("Cloning RAM repositories")
     clone_ram_control()
-    
+
     sign_python()
     print("Installation complete")
+
 
 if __name__ == '__main__':
     run()
