@@ -14,6 +14,7 @@
     * `git submodule init`
     * `git submodule update`
     * Plug in an ethernet cable to connect the task laptop to the host PC
+    * Extract videos: `./vidextract.sh`
     * Allow through firewall:
       `cd ~/RAM_3.0; ./run_experiment --no-fs --experiment=FR1 --subject=test`
       then agree to the popup
