@@ -150,8 +150,9 @@ def run():
     print("Attempting to disable network time...")
     os.system("systemsetup -setusingnetworktime off")
 
-    print("Cloning RAM repositories")
-    clone_ram_control()
+    # As implemented, this will probably not work correctly with 3.1
+    # print("Cloning RAM repositories")
+    # clone_ram_control()
 
     sign_python()
     print("Installation complete")
