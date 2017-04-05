@@ -1,5 +1,12 @@
 # Task laptop upgrade instructions
 
+## WARNING
+
+These instructions are for upgrading PyEPL to work with System 3.0 based on an
+already existing System 2 setup. The following steps should not be followed
+for upgrading from version 3.0 to version 3.1. Instead, see the
+[RAMControl](https://github.com/ramdarpaprojectorg/RAMControl) repository.
+
 The following steps must be performed by the `exp`. You must also first
 **temporarily grant admin rights** to the `exp` user.
 
