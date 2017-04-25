@@ -18,11 +18,10 @@ be working!
 1. Upgrade the operating system to Sierra (this can be done through the App
    Store).
 2. Download [Miniconda](https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh)
-3. Clone or download this repository
-4. Upgrade PyEPL (crossed out stuff is old and probably only applies to version 3.0):
+3. Upgrade PyEPL (crossed out stuff is old and probably only applies to version 3.0):
 
     * Install miniconda and accept all defaults: `bash Miniconda2-latest-MacOSX-x86_64.sh`
-    * Clone this repository: `git clone https://github.com/ramdarpaprojectorg/pyepl_upgrade.git`
+    * Clone or download this repository: `git clone https://github.com/ramdarpaprojectorg/pyepl_upgrade.git`
     * Fix path issues: `python setup.py`
     * Restart terminal so python version will take effect
     * Install: `sudo python setup.py`
@@ -33,15 +32,19 @@ be working!
     * ~~`git submodule init`~~
     * ~~`git submodule update`~~
     * ~~Extract videos: `./vidextract.sh`~~
-    * Plug in an ethernet cable to connect the task laptop to the host PC
+    * For upload, copy the RAMTransfer-keys from previous installation: `cp ~/RAM_2.0/source/RAMTransfer-Keys ~/RAM_3.1/source/`
+    * Set permissions on the keys: `chmod 600 ~/RAM_3.1/source/RAMTransfer-keys/*`
+    * So the password for the key is saved in the laptop keychain, create a file ~/.ssh/config that reads:
+            Host *
+                  UseKeychain yes
+    * Run upload tool and type in keychain password when prompted.
+    * Connect the task laptop to the host PC via ethernet cable
     * Allow through firewall:
       `cd ~/RAM_3.1; ./run_experiment -d --experiment=FR1 --subject=R0000X`
-      then agree to the popup
+      then agree to the popup.
 
-5. Fix System 2 run scripts to be able to continue using them:
-
-    * Edit run scripts and change the line `PYTHON_CMD="python2.6"` to `PYTHON_CMD="python"`.
+5. Fix System 1 and System 2 run scripts to be able to continue using them:
+    * Edit run scripts (using XCode) and change the line `PYTHON_CMD="python2.6"` to `PYTHON_CMD="python"`.
     * Run by double clicking the run script as usual.
-
 
 [RAMControl]: https://github.com/ramdarpaprojectorg/RAMControl
