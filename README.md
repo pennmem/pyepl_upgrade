@@ -25,7 +25,7 @@ be working!
     * Fix path issues: `python setup.py`
     * Restart terminal so python version will take effect
     * Install: `sudo python setup.py`
-    * Get pyzmq: `conda -y install pyzmq`
+    * Get pyzmq: `conda install pyzmq`
     * Clone RAMControl 3.1 and follow all instructions there (see [RAMControl][])
     * ~~Fix permissions: `sudo chown -R exp ~/RAM_3.0`~~
     * ~~`cd ~/RAM_3.0`~~
